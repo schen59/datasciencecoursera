@@ -1,5 +1,5 @@
 # How the script works
-* The script reds the training and tessting data sets together with the feature information, subject informaiton and activity label information to construct a tidy dataset which has the related activity labels and subject labels and it filters out the needed variables for the tidy dataset
+* The script reads the training and testing data sets together with the feature information, subject information and activity label information to construct a tidy dataset which has the related activity labels and subject labels and it filters out the needed variables for the tidy dataset
 * It averages each variables by subject and activity by using dplyr library
 
 # How to run the script
@@ -9,7 +9,7 @@
 * __result.txt__ will be generated with the dataset
 
 # Variable names
-All the value of variable is an average by subject and activity for the original data sets. 
+All the value of variable is an average by subject and activity from the original data sets. 
 
 * __subject__: subject for the data point
 * __activity_label__: activity label 
