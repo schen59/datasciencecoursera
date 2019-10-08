@@ -1,0 +1,114 @@
+---
+title: "Practical Machine Learning Project"
+author: "Shaofeng Chen"
+date: "10/6/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, the goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+
+The goal of this project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set.
+
+## Cleaning and Exploring data
+
+```{r, echo=TRUE}
+training <- read.csv("./pml-training.csv", header = T)
+validating <- read.csv("./pml-testing.csv", header = T)
+```
+
+We get the summary of the training data:
+```{r, echo=TRUE}
+summary(training)
+```
+We saw that the first seven variables are metadata related and has little impact on the model building and prediction, we can remove them from the data:
+```{r, echo=TRUE}
+library(caret)
+training <- training[, -c(1:7)]
+validating <- validating[, -c(1:7)]
+```
+And there are columes with missing values which should be cleaned as well:
+```{r, echo=TRUE}
+training <- training[, colSums(is.na(training)) == 0]
+validating <- validating[, colSums(is.na(training)) == 0]
+NZV <- nearZeroVar(training)
+training <- training[, -NZV]
+dim(training)
+```
+
+## Create Training Dataset
+
+We split the training data as 70% training data and 30% for testing:
+```{r, echo=TRUE}
+set.seed(2019)
+inTrain <- createDataPartition(training$classe, p = 0.7, list = FALSE)
+trainData <- training[inTrain, ]
+testData <- training[-inTrain, ]
+```
+
+## Training with Classfication Tree
+
+We are trying to traing the data with all the variables in the input with 5 fold cross validation:
+```{r, echo=TRUE}
+trControl <- trainControl(method = "cv", number = 5)
+classficationTree <- train(classe ~ ., data = trainData, method = "rpart", trControl = trControl)
+```
+
+The classfication tree model will look like:
+```{r, echo=TRUE}
+library(rattle)
+fancyRpartPlot(classficationTree$finalModel)
+```
+
+The prediction on the testing data:
+```{r, echo=TRUE}
+predictCT <- predict(classficationTree, testData)
+cm <- confusionMatrix(predictCT, testData$classe)
+cm$overall[1]  
+```
+
+We saw that the accuracy of the classfication tree is low and not good as a candidate for the final model.
+
+## Training with Random Forests
+
+```{r, echo=TRUE}
+randomForest <- train(classe ~ ., data = trainData, method = "rf", trControl = trControl, verbose = FALSE)
+plot(randomForest, main = "Accuracy by number of predictors")
+```
+
+We then evaludate the prediction performance of the random forest:
+```{r, echo=TRUE}                          
+predictRF <- predict(randomForest, newdata = testData)
+cm <- confusionMatrix(predictRF, testData$classe)
+cm$overall[1]
+```
+We saw that with random forest we can reach accurary of `r cm$overall[1]` using cross validation of 5 folds.
+
+## Training with Gradient Boosting Method
+
+```{r, echo=TRUE}
+GBM <- train(classe ~ ., data = trainData, method = "gbm", trControl = trControl, verbose = FALSE)
+plot(GBM)
+```
+
+We then evaludate the prediction performance of the gradient boosting method:
+```{r, echo=TRUE}
+predictGBM <- predict(GBM, newdata = testData)
+cm <- confusionMatrix(predictGBM, testData$classe)
+cm$overall[1]
+```
+We saw that the accuracy of gradient boosting method is `r cm$overall[1]`.
+
+## Conclusion
+Since random forest has the best performance on the training set, we use it to predict the classes of the test set:
+```{r, echo=TRUE}
+p <- predict(randomForest, newdata = validating)
+p
+```
