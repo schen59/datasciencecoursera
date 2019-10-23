@@ -1,0 +1,40 @@
+Developing Data Products - Course Project
+========================================================
+author: Shaofeng Chen
+date: Oct, 23, 2019
+autosize: true
+
+Introduction
+========================================================
+
+This presentation tries to find the best factors to predict mile per galon(MPG) for a car.
+
+Datasets
+========================================================
+
+We use the cars dataset for the prediction:
+```{r, echo=F}
+summary(mtcars)
+```
+
+How to use the App
+========================================================
+
+Select the checkbox for combination of prediction factors:
+- cyl
+- disp
+- hp
+- drat
+- wt
+- qsec
+- vs
+- am
+- gear
+- carb
+
+And you'll see the relationship between predicted MPG and actual MPG
+
+Reference
+========================================================
+
+Github repo:https://github.com/schen59/datasciencecoursera/tree/master/dataproducts/week4
