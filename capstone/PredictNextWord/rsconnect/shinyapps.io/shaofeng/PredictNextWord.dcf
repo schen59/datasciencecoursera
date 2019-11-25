@@ -1,0 +1,12 @@
+name: PredictNextWord
+title: PredictNextWord
+username:
+account: shaofeng
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1523775
+bundleId: 2616642
+url: https://shaofeng.shinyapps.io/PredictNextWord/
+when: 1574709271.40072
+asMultiple: FALSE
+asStatic: FALSE
